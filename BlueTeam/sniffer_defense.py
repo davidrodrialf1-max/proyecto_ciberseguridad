@@ -7,16 +7,22 @@ from alert_logger import registrar_alerta
 def detect_arp_spoof(packet):
     # Verificamos si el paquete tiene la capa ARP
     if packet.haslayer(ARP):
-        # Opcional: Imprimir todos los paquetes ARP que ve (para depurar y ver que sí está leyendo tráfico)
-        # print(f"[DEBUG] Paquete ARP detectado: OP={packet[ARP].op} | IP={packet[ARP].psrc} | MAC={packet[ARP].hwsrc}")
-        
         # Si detectamos una respuesta ARP (op=2), es un indicio de ARP Spoofing
         if packet[ARP].op == 2:
             timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            ip_origen = packet[ARP].psrc
+            mac_atacante = packet[ARP].hwsrc
+            ip_destino = packet[ARP].pdst
+            
+            # Imprime en consola (como lo tienes ahora)
             print(f"\n[!] ¡ALERTA DE SEGURIDAD! [{timestamp}] Tráfico ARP sospechoso detectado.")
-            print(f"    -> IP Origen: {packet[ARP].psrc}")
-            print(f"    -> MAC Atacante: {packet[ARP].hwsrc}")
-            print(f"    -> IP Destino: {packet[ARP].pdst}\n")
+            print(f"    -> IP Origen: {ip_origen}")
+            print(f"    -> MAC Atacante: {mac_atacante}")
+            print(f"    -> IP Destino: {ip_destino}\n")
+            
+            # <--- ¡FALTA ESTA LÍNEA AQUÍ PARA QUE ESCRIBA EL LOG! --->
+            mensaje_log = f"Ataque ARP Spoofing detectado. IP Origen: {ip_origen}, MAC Atacante: {mac_atacante}"
+            registrar_alerta("SnifferDefense", mensaje_log)
 
 def start_sniffer():
     print("==================================================")
