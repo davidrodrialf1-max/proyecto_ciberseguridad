@@ -2,6 +2,7 @@
 from scapy.all import sniff, ARP
 import sys
 import datetime
+from alert_logger import registrar_alerta
 
 def detect_arp_spoof(packet):
     # Verificamos si el paquete tiene la capa ARP
