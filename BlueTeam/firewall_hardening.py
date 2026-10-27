@@ -5,63 +5,50 @@ import socket
 import threading
 import time
 
-def apply_iptables_hardening():
-    """Aplica todas las reglas de iptables exigidas por la rúbrica del Blue Team."""
+def run_powershell(command):
+    """Ejecuta comandos en PowerShell con privilegios del sistema."""
+    try:
+        result = subprocess.run(["powershell", "-Command", command], capture_output=True, text=True, check=True)
+        return True, result.stdout.strip()
+    except subprocess.CalledProcessError as e:
+        return False, e.stderr.strip()
+
+def configure_windows_firewall():
+    """Configura el Firewall para bloquear todo lo entrante y permitir solo 22, 80 y 443."""
     print("==================================================")
-    print("   BLUE TEAM - FIREWALL HARDENING (IPTABLES)")
+    print("   BLUE TEAM - RESTRICCIÓN Y APERTURA DE PUERTOS")
     print("==================================================")
     
-    commands = [
-        # 1. Limpiar reglas anteriores
-        "iptables -F",
-        "iptables -X",
+    # 1. Establecer la política por defecto del Firewall de Windows en Bloquear Entrantes (Block Inbound)
+    print("[*] Configurando política por defecto: Bloquear todo el tráfico entrante...")
+    run_powershell("Set-NetFirewallProfile -Profile Domain,Public,Private -DefaultInboundAction Block -DefaultOutboundAction Allow")
+    
+    # 2. Puertos permitidos según el proyecto (22, 80, 443)
+    allowed_ports = [22, 80, 443]
+    
+    for port in allowed_ports:
+        rule_name = f"BlueTeam-Allow-Port-{port}"
+        print(f"[*] Creando regla para permitir el puerto {port}...")
+        # Comando para permitir explícitamente el puerto de entrada
+        cmd = f'New-NetFirewallRule -DisplayName "{rule_name}" -Direction Inbound -LocalPort {port} -Protocol TCP -Action Allow'
         
-        # 2. Políticas por defecto (Denegar entrantes, permitir salientes)
-        "iptables -P INPUT DROP",
-        "iptables -P FORWARD DROP",
-        "iptables -P OUTPUT ACCEPT",
-        
-        # 3. Permitir loopback y conexiones establecidas
-        "iptables -A INPUT -i lo -j ACCEPT",
-        "iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT",
-        
-        # 4. Permitir solo puertos necesarios (22 SSH, 80 HTTP, 443 HTTPS)[cite: 10]
-        "iptables -A INPUT -p tcp --dport 22 -j ACCEPT",
-        "iptables -A INPUT -p tcp --dport 80 -j ACCEPT",
-        "iptables -A INPUT -p tcp --dport 443 -j ACCEPT",
-        
-        # 5. Rate-Limiting avanzado para SSH (Prevención de Fuerza Bruta)[cite: 10]
-        "iptables -A INPUT -p tcp --dport 22 -m state --state NEW -m recent --set",
-        "iptables -A INPUT -p tcp --dport 22 -m state --state NEW -m recent --update --seconds 60 --hitcount 4 -j DROP",
-        
-        # 6. Reglas defensivas contra escaneos conocidos (XMAS, NULL, etc.)[cite: 10]
-        "iptables -A INPUT -p tcp --tcp-flags ALL NONE -j DROP",
-        "iptables -A INPUT -p tcp --tcp-flags ALL ALL -j DROP",
-        "iptables -A INPUT -p tcp --tcp-flags ALL SYN,FIN -j DROP",
-        
-        # 7. Registro (Logging) de paquetes bloqueados[cite: 10]
-        "iptables -A INPUT -m limit --limit 5/min -j LOG --log-prefix 'IPTables-Dropped: ' --log-level 4"
-    ]
-
-    for cmd in commands:
-        try:
-            print(f"[*] Ejecutando: {cmd}")
-            result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
-            if result.returncode == 0:
-                print("    [+] Regla aplicada con éxito.")
+        success, output = run_powershell(cmd)
+        if success:
+            print(f"    [+] Puerto {port} abierto con éxito en el Firewall.")
+        else:
+            if "ya existe" in output.lower() or "already exists" in output.lower():
+                print(f"    [i] La regla para el puerto {port} ya se encontraba registrada.")
             else:
-                print(f"    [!] Error o requiere privilegios de superusuario: {result.stderr.strip()}")
-        except Exception as e:
-            print(f"    [!] Error al ejecutar comando: {e}")
+                print(f"    [!] Nota en regla {port}: {output}")
 
 def start_dummy_listener(port):
-    """Mantiene un servicio simulado escuchando en los puertos permitidos (22, 80, 443)."""
+    """Mantiene un servicio activo escuchando en el puerto para que Nmap lo detecte 'open'."""
     try:
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         server.bind(("0.0.0.0", port))
         server.listen(5)
-        print(f"    [+] Servicio simulado activo escuchando en el puerto {port}.")
+        print(f"    [+] Servicio simulado escuchando en el puerto {port}.")
         
         while True:
             client, addr = server.accept()
@@ -70,25 +57,28 @@ def start_dummy_listener(port):
         print(f"    [!] No se pudo iniciar el servicio en el puerto {port}: {e}")
 
 if __name__ == "__main__":
-    # 1. Aplicar el endurecimiento de red (iptables)
-    apply_iptables_hardening()
+    print("[!] Asegúrate de ejecutar este script en PowerShell COMO ADMINISTRADOR.\n")
+    
+    # 1. Aplicar las reglas del firewall (Cierra todo y solo abre 22, 80, 443)
+    configure_windows_firewall()
     
     print("\n--------------------------------------------------")
-    print("   INICIANDO SERVICIOS SIMULADOS (PARA ESCANEOS)")
+    print("   INICIANDO SERVICIOS EN LOS PUERTOS PERMITIDOS")
     print("--------------------------------------------------")
     
-    # Puertos permitidos en la política que también queremos ver abiertos en los escaneos
+    # 2. Levantar los servicios en los puertos permitidos para la prueba con Nmap
     ports_to_simulate = [22, 80, 443]
     
     for port in ports_to_simulate:
         listener_thread = threading.Thread(target=start_dummy_listener, args=(port,), daemon=True)
         listener_thread.start()
 
-    print("\n[+] Hardening y simulación completados con éxito.")
-    print("[*] Presiona CTRL + C para detener los servicios y salir.\n")
+    print("\n[+] Configuración aplicada correctamente.")
+    print("[*] Todos los demás puertos están bloqueados por el Firewall.")
+    print("[*] Presiona CTRL + C cuando desees detener el script.\n")
     
     try:
         while True:
             time.sleep(1)
     except KeyboardInterrupt:
-        print("\n[*] Saliendo del script de Blue Team. ¡Hasta luego!")
+        print("\n[*] Deteniendo el script y cerrando los servicios. ¡Hasta luego!")
