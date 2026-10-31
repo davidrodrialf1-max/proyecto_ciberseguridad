@@ -15,12 +15,12 @@ def run_powershell(command):
 
 def configure_windows_firewall():
     """Configura el Firewall para bloquear todo lo entrante y permitir solo 22, 80 y 443."""
-    print("==================================================")
+    print(" ")
     print("   BLUE TEAM - RESTRICCIÓN Y APERTURA DE PUERTOS")
-    print("==================================================")
+    print(" ")
     
     # 1. Establecer la política por defecto del Firewall de Windows en Bloquear Entrantes (Block Inbound)
-    print("[*] Configurando política por defecto: Bloquear todo el tráfico entrante...")
+    print(" Configurando política por defecto: Bloquear todo el tráfico entrante...")
     run_powershell("Set-NetFirewallProfile -Profile Domain,Public,Private -DefaultInboundAction Block -DefaultOutboundAction Allow")
     
     # 2. Puertos permitidos según el proyecto (22, 80, 443)
@@ -28,7 +28,7 @@ def configure_windows_firewall():
     
     for port in allowed_ports:
         rule_name = f"BlueTeam-Allow-Port-{port}"
-        print(f"[*] Creando regla para permitir el puerto {port}...")
+        print(f" Creando regla para permitir el puerto {port}...")
         # Comando para permitir explícitamente el puerto de entrada
         cmd = f'New-NetFirewallRule -DisplayName "{rule_name}" -Direction Inbound -LocalPort {port} -Protocol TCP -Action Allow'
         
@@ -62,9 +62,9 @@ if __name__ == "__main__":
     # 1. Aplicar las reglas del firewall (Cierra todo y solo abre 22, 80, 443)
     configure_windows_firewall()
     
-    print("\n--------------------------------------------------")
+    print(" ")
     print("   INICIANDO SERVICIOS EN LOS PUERTOS PERMITIDOS")
-    print("--------------------------------------------------")
+    print(" ")
     
     # 2. Levantar los servicios en los puertos permitidos para la prueba con Nmap
     ports_to_simulate = [22, 80, 443]
@@ -81,4 +81,4 @@ if __name__ == "__main__":
         while True:
             time.sleep(1)
     except KeyboardInterrupt:
-        print("\n[*] Deteniendo el script y cerrando los servicios. ¡Hasta luego!")
+        print("\n Deteniendo el script y cerrando los servicios.")
