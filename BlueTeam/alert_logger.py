@@ -1,5 +1,3 @@
-# blue_team/alert_logger.p# blue_team/alert_logger.py
-# blue_team/alert_logger.py
 import datetime
 import time
 
@@ -21,11 +19,11 @@ def registrar_alerta(origen, mensaje):
         print(f"[!] Error al escribir en el archivo de logs: {e}")
 
 if __name__ == "__main__":
-    print("==================================================")
+    print(" ")
     print("   BLUE TEAM - GESTOR Y REGISTRO DE ALERTAS")
-    print("==================================================")
-    print("[*] Alert Logger activo y en ejecución continua.")
-    print("[*] Presiona CTRL + C para detener el servicio de logs.\n")
+    print(" ")
+    print(" Alert Logger activo y en ejecución continua.")
+    print(" Presiona CTRL + C para detener el servicio de logs.\n")
     
     # Registrar evento de inicio
     registrar_alerta("AlertLogger", "Servicio de alertas iniciado y en espera de eventos.")
