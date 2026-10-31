@@ -16,7 +16,7 @@ def registrar_alerta(origen, mensaje):
             f.write(log_entry)
         print(f"[LOG GUARDADO] {log_entry.strip()}")
     except Exception as e:
-        print(f"[!] Error al escribir en el archivo de logs: {e}")
+        print(f" Error al escribir en el archivo de logs: {e}")
 
 if __name__ == "__main__":
     print(" ")
@@ -33,4 +33,4 @@ if __name__ == "__main__":
         while True:
             time.sleep(1)
     except KeyboardInterrupt:
-        print("\n[*] Servicio de alertas detenido correctamente por el usuario. ¡Hasta luego!")
+        print("\n Servicio de alertas detenido correctamente por el usuario. ¡Hasta luego!")
