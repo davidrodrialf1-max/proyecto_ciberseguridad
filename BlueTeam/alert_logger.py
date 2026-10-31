@@ -33,4 +33,4 @@ if __name__ == "__main__":
         while True:
             time.sleep(1)
     except KeyboardInterrupt:
-        print("\n Servicio de alertas detenido correctamente por el usuario. ¡Hasta luego!")
+        print("\n Servicio de alertas detenido correctamente por el usuario.")
