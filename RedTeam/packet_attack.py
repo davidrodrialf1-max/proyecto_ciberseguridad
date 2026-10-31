@@ -41,6 +41,6 @@ if __name__ == "__main__":
 
     try:
         # 2. El hilo principal se queda escuchando (sniffing) todo el tráfico que provenga de la víctima
-        sniff(filter=f"host {targetIP}", prn=process_packet, store=0)
+        sniff(prn=process_packet, store=0)
     except KeyboardInterrupt:
         print("\n[!] El ataque y la captura se detuvieron correctamente.")
