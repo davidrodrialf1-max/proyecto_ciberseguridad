@@ -1,4 +1,3 @@
-# blue_team/os_audit.py
 import subprocess
 import os
 
