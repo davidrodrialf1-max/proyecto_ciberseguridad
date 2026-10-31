@@ -1,6 +1,7 @@
 Descripción del propósito del laboratorio.
 
 ● Roles de Blue Team y Red Team.
+
 RedTeam: Atacar BlueTeam
 
 BlueTeam: Defender y capturar ataques del RedTeam
