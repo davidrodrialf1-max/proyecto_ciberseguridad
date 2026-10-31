@@ -20,3 +20,4 @@ Metadología de los scripts
    Metodología: Con este script se ejecuta un ataque de diccionario automatizado contra el servicio SSH utilzando credenciales tipo wordlist.
    
 ● Cómo evaluar el éxito de los ataques o defensas
+Mediante la prueba de cada script, así se logra validar si funciona. 
