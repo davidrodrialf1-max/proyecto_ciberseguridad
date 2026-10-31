@@ -1,4 +1,3 @@
-# blue_team/firewall_hardening.py
 import subprocess
 import sys
 import socket
