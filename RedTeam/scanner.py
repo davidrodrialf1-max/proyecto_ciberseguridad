@@ -1,4 +1,3 @@
-# red_team/scanner.py
 import subprocess
 import sys
 
