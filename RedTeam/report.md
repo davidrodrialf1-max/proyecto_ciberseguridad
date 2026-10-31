@@ -8,6 +8,17 @@ Metadología de los scripts
    1.1 Se idenficaron los puertos abiertos principales:
    2.2 Servicios de los puertos:
 
-2. 
-Reflexión sobre la eficacia del Blue Team.
-Recomendaciones de mejora.
+2. Análisis de tráfico y Spoofing
+   Metodología: Se utilizó Scapy desde la máquina virtual atacante conectada a la misma red local virtual ZeroTier para realizar pruebas de captura de paquetes y suplantación ARP.
+   Evidencias y hallazgos
+   1.1 El script funciona perfecto, lanza ARP e imprime todo el trafico de red del la Blue
+
+3. Pruebas de acceso no autorizado
+   Metodología: Con este script se ejecuta un ataque de diccionario automatizado contra el servicio SSH utilzando credenciales tipo wordlist.
+   Evidencias y hallazgos:
+   Se logró identificar la contraseña que utiliza el Windows de la máquina Azul.
+
+4. Conclusiones y recomendaciones
+   Restringir el acceso mediante SSH
+   Bloquear de manera automatizada altos volúmenes de ARP 
+
