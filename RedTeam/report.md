@@ -13,7 +13,7 @@ Metadología de los scripts
    
 2. Análisis de tráfico y Spoofing (packet_attack.py)
 
-   Metodología: Se utilizó Scapy desde la máquina virtual atacante conectada a la misma red local virtual ZeroTier para realizar pruebas de captura de paquetes y suplantación ARP.
+   Metodología: Se utilizó Scapy desde la máquina virtual atacante conectada a la misma red local virtual ZeroTier para realizar pruebas de captura de paquetes y suplantación SSH en el puerto 22.
    
    Evidencias y hallazgos:
    
