@@ -34,7 +34,7 @@ def ataque_fuerzabruta_ssh(IP, usuario, archivo_contraseñas):
                     except:
                         pass
                 
-                # Pequeña pausa para evitar saturar el OpenSSH de Windows y el error 10054
+                # Pequeña pausa para que no de bloqueos
                 time.sleep(10)
 
         print("Ataque finalizado. No se encontró la contraseña")
