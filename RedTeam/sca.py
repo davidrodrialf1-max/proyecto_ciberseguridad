@@ -34,7 +34,7 @@ def ataque_fuerzabruta_ssh(IP, usuario, archivo_contraseñas):
                     except:
                         pass
                 
-                # Pequeña pausa para que no de bloqueos
+                
                 time.sleep(0.5)
 
         print("Ataque finalizado. No se encontró la contraseña")
