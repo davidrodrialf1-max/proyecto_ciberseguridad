@@ -1,39 +1,38 @@
-from scapy.all import sniff, ARP
+from scapy.all import sniff, TCP, IP
 import sys
 import datetime
 from alert_logger import registrar_alerta
 
-def detect_arp_spoof(packet):
-    # Verificamos si el paquete tiene la capa ARP
-    if packet.haslayer(ARP):
-        # Si detectamos una respuesta ARP (op=2), es un indicio de ARP Spoofing
-        if packet[ARP].op == 2:
+def detect_ssh_brute_force(packet):
+    
+    if packet.haslayer(TCP) and packet.haslayer(IP):
+        
+        if packet[TCP].dport == 22 or packet[TCP].sport == 22:
             timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            ip_origen = packet[ARP].psrc
-            mac_atacante = packet[ARP].hwsrc
-            ip_destino = packet[ARP].pdst
+            ip_origen = packet[IP].src
+            ip_destino = packet[IP].dst
+            puerto_origen = packet[TCP].sport
             
-            # Imprime en consola (como lo tienes ahora)
-            print(f"\n Alerta de seguridad [{timestamp}] Tráfico ARP sospechoso detectado.")
-            print(f"    -> IP Origen: {ip_origen}")
-            print(f"    -> MAC Atacante: {mac_atacante}")
-            print(f"    -> IP Destino: {ip_destino}\n")
+            # Imprime en consola con un formato de alerta similar
+            print(f"\n[!] Alerta de seguridad [{timestamp}] Actividad SSH sospechosa / Fuerza Bruta detectada.")
+            print(f"    -> IP Origen (Atacante): {ip_origen}")
+            print(f"    -> IP Destino (Víctima): {ip_destino}")
+            print(f"    -> Puerto TCP: {packet[TCP].dport}\n")
             
-            # <--- ¡FALTA ESTA LÍNEA AQUÍ PARA QUE ESCRIBA EL LOG! --->
-            mensaje_log = f"Ataque ARP Spoofing detectado. IP Origen: {ip_origen}, MAC Atacante: {mac_atacante}"
-            registrar_alerta("SnifferDefense", mensaje_log)
+            
+            mensaje_log = f"Intento de acceso SSH detectado desde la IP: {ip_origen} hacia el puerto 22"
+            registrar_alerta("BlueTeam-SSH-Defense", mensaje_log)
 
 def start_sniffer():
-    print("   BLUE TEAM - IDS / DETECCIÓN DE ARP SPOOFING")
+    print("   BLUE TEAM - IDS / DETECCIÓN DE ACCESOS SSH EN AZURE")
     print(" ")
-    print("Iniciando defensa: Sniffer de red activo...")
-    print("Monitoreando tráfico en busca de anomalías ARP.")
+    print("Iniciando defensa: Sniffer de red activo en puerto 22...")
+    print("Monitoreando tráfico TCP/IP en busca de ataques de fuerza bruta.")
     print("Presiona Ctrl + C para detener el sniffer.\n")
     
     try:
-        # Quitamos el filtro estricto "arp" del motor de Scapy y filtramos por código en Python
-        # store=0 evita consumo excesivo de memoria guardando paquetes en RAM
-        sniff(prn=detect_arp_spoof, store=0)
+        
+        sniff(filter="tcp port 22", prn=detect_ssh_brute_force, store=0)
     except Exception as e:
         print(f"Error en el sniffer. Asegúrate de ejecutar como Administrador y tener Npcap instalado. Detalle: {e}")
 
